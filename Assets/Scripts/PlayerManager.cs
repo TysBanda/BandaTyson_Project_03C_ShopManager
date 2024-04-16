@@ -4,28 +4,47 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    private int coins = 1000;
-    private int numOfItem1 = 0;
-    private int numOfItem2 = 0;
-    private int numOfItem3 = 0;
-
-    private int costOfItem1 = 10;
-    private int costOfItem2 = 20;
-    private int costOfItem3 = 30;
+    public float coins = 1000;
+    public float numOfItem1 = 0;
+    public float numOfItem2 = 0;
+    public float numOfItem3 = 0;
+    private ShopManager shopManager;
 
     private void Start()
     {
-        
+        shopManager = GameObject.FindObjectOfType<ShopManager>();
     }
 
-    public void buyItem1()
+    public void buyItem(string itemName)
     {
-        if(coins >= costOfItem1)
+        if (!shopManager.GetItemPrices().ContainsKey(itemName))
         {
-            numOfItem1++;
-            coins -= costOfItem1;
-            print("Item1 purchased. You have " + numOfItem1.ToString()
-                + " Item1 and " + coins.ToString() + " coins.");
+            Debug.LogError("Item " + itemName + " does not exist in the shop!");
+            return;
+        }
+
+        float itemPrice = shopManager.GetItemPrices()[itemName];
+
+        if (coins >= itemPrice)
+        {
+            switch (itemName)
+            {
+                case "Item1":
+                    numOfItem1++;
+                    break;
+                case "Item2":
+                    numOfItem2++;
+                    break;
+                case "Item3":
+                    numOfItem3++;
+                    break;
+                default:
+                    Debug.LogError("Invalid item name: " + itemName);
+                    return;
+            }
+
+            coins -= itemPrice;
+            print(itemName + " purchased. You have " + GetNumberOfItems(itemName) + " " + itemName + " and " + coins.ToString() + " coins.");
         }
         else
         {
@@ -33,33 +52,18 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public void buyItem2()
+    private float GetNumberOfItems(string itemName)
     {
-        if (coins >= costOfItem2)
+        switch (itemName)
         {
-            numOfItem2++;
-            coins -= costOfItem2;
-            print("Item2 purchased. You have " + numOfItem2.ToString()
-                + " Item2 and " + coins.ToString() + " coins.");
-        }
-        else
-        {
-            print("Not enough coins");
-        }
-    }
-
-    public void buyItem3()
-    {
-        if (coins >= costOfItem3)
-        {
-            numOfItem3++;
-            coins -= costOfItem3;
-            print("Item3 purchased. You have " + numOfItem3.ToString()
-                + " Item3 and " + coins.ToString() + " coins.");
-        }
-        else
-        {
-            print("Not enough coins");
+            case "Item1":
+                return numOfItem1;
+            case "Item2":
+                return numOfItem2;
+            case "Item3":
+                return numOfItem3;
+            default:
+                return 0;
         }
     }
 }
