@@ -7,7 +7,6 @@ public class ShopDevTool : MonoBehaviour
 {
     public ShopManager shopManager;
 
-
     public string newItemName;
     public int newItemPrice;
 
@@ -19,7 +18,6 @@ public class ShopDevTool : MonoBehaviour
         }
     }
 
-
     public void AddNewItem()
     {
         if (string.IsNullOrEmpty(newItemName))
@@ -29,21 +27,11 @@ public class ShopDevTool : MonoBehaviour
         }
 
         shopManager.AddItem(newItemName, newItemPrice);
-        newItemName = ""; 
+        newItemName = "";
         newItemPrice = 0;
     }
 
-
-    public void RemoveItem(string itemName)
-    {
-        shopManager.RemoveItem(itemName);
-    }
-
-
-    public void UpdateItemPrice(string itemName, int newPrice)
-    {
-        shopManager.UpdateItemPrice(itemName, newPrice);
-    }
+   
 }
 
 [CustomEditor(typeof(ShopDevTool))]
@@ -55,6 +43,12 @@ public class ShopDevToolEditor : Editor
 
         ShopDevTool devTool = (ShopDevTool)target;
 
+        if (devTool.shopManager == null)
+        {
+            EditorGUILayout.HelpBox("Assign ShopManager reference in the inspector!", MessageType.Warning);
+            return;
+        }
+
         GUILayout.Space(10);
 
         GUILayout.Label("Add New Item:");
@@ -64,32 +58,9 @@ public class ShopDevToolEditor : Editor
         if (GUILayout.Button("Add Item"))
         {
             devTool.AddNewItem();
+        
         }
 
-        GUILayout.Space(10);
-
-        GUILayout.Label("Remove Item:");
-        foreach (KeyValuePair<string, int> item in devTool.shopManager.GetItemPrices())
-        {
-            if (GUILayout.Button("Remove " + item.Key))
-            {
-                devTool.RemoveItem(item.Key);
-            }
-        }
-
-        GUILayout.Space(10);
-
-        GUILayout.Label("Update Item Prices:");
-        foreach (KeyValuePair<string, int> item in devTool.shopManager.GetItemPrices())
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(item.Key);
-            int newPrice = EditorGUILayout.IntField(item.Value);
-            if (newPrice != item.Value)
-            {
-                devTool.UpdateItemPrice(item.Key, newPrice);
-            }
-            GUILayout.EndHorizontal();
-        }
+     
     }
 }

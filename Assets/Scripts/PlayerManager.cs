@@ -5,18 +5,31 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     public float coins = 1000;
-    public float numOfItem1 = 0;
-    public float numOfItem2 = 0;
-    public float numOfItem3 = 0;
+    private Dictionary<string, float> inventory = new Dictionary<string, float>();
     private ShopManager shopManager;
 
     private void Start()
     {
-        shopManager = GameObject.FindObjectOfType<ShopManager>();
+
+        shopManager = FindObjectOfType<ShopManager>();
+
+
+        if (shopManager == null)
+        {
+            Debug.LogError("ShopManager component not found in the scene.");
+        }
     }
 
-    public void buyItem(string itemName)
+    public void BuyItem(string itemName)
     {
+
+        if (shopManager == null)
+        {
+            Debug.LogError("ShopManager reference not set in PlayerManager!");
+            return;
+        }
+
+ 
         if (!shopManager.GetItemPrices().ContainsKey(itemName))
         {
             Debug.LogError("Item " + itemName + " does not exist in the shop!");
@@ -27,43 +40,26 @@ public class PlayerManager : MonoBehaviour
 
         if (coins >= itemPrice)
         {
-            switch (itemName)
+            if (inventory.ContainsKey(itemName))
             {
-                case "Item1":
-                    numOfItem1++;
-                    break;
-                case "Item2":
-                    numOfItem2++;
-                    break;
-                case "Item3":
-                    numOfItem3++;
-                    break;
-                default:
-                    Debug.LogError("Invalid item name: " + itemName);
-                    return;
+                inventory[itemName]++;
+            }
+            else
+            {
+                inventory[itemName] = 1;
             }
 
             coins -= itemPrice;
-            print(itemName + " purchased. You have " + GetNumberOfItems(itemName) + " " + itemName + " and " + coins.ToString() + " coins.");
+            Debug.Log(itemName + " purchased. You have " + GetNumberOfItems(itemName) + " " + itemName + "(s) and " + coins.ToString() + " coins remaining.");
         }
         else
         {
-            print("Not enough coins");
+            Debug.Log("Not enough coins to purchase " + itemName);
         }
     }
 
     private float GetNumberOfItems(string itemName)
     {
-        switch (itemName)
-        {
-            case "Item1":
-                return numOfItem1;
-            case "Item2":
-                return numOfItem2;
-            case "Item3":
-                return numOfItem3;
-            default:
-                return 0;
-        }
+        return inventory.ContainsKey(itemName) ? inventory[itemName] : 0;
     }
 }

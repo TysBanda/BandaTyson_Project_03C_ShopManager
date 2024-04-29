@@ -1,67 +1,71 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ShopManager : MonoBehaviour
 {
+    public Transform itemListParent;
+    public GameObject itemGroupPrefab;
+    public TMP_Text itemNameText;
+    public TMP_Text itemPriceText;
+
     private Dictionary<string, int> itemPrices = new Dictionary<string, int>();
 
-    private void Start()
-    {
-        // Initialize item prices
-        InitializeItems();
-    }
-
-    private void InitializeItems()
-    {
-        // Set initial item prices
-        itemPrices.Add("Item1", 10);
-        itemPrices.Add("Item2", 20);
-        itemPrices.Add("Item3", 30);
-    }
-
-    // Method to add a new item to the shop
-    public void AddItem(string itemName, int price)
+    public void AddItem(string itemName, int itemPrice)
     {
         if (!itemPrices.ContainsKey(itemName))
         {
-            itemPrices.Add(itemName, price);
-        }
-        else
-        {
-            Debug.LogWarning("Item " + itemName + " already exists!");
+            itemPrices.Add(itemName, itemPrice);
+            CreateGroupForItem(itemName, itemPrice);
         }
     }
 
-    // Method to remove an item from the shop
     public void RemoveItem(string itemName)
     {
         if (itemPrices.ContainsKey(itemName))
         {
             itemPrices.Remove(itemName);
-        }
-        else
-        {
-            Debug.LogWarning("Item " + itemName + " does not exist!");
+            Destroy(itemListParent.Find(itemName).gameObject);
         }
     }
 
-    // Method to update the price of an existing item
     public void UpdateItemPrice(string itemName, int newPrice)
     {
         if (itemPrices.ContainsKey(itemName))
         {
             itemPrices[itemName] = newPrice;
-        }
-        else
-        {
-            Debug.LogWarning("Item " + itemName + " does not exist!");
+            UpdateGroupPrice(itemName, newPrice);
         }
     }
 
-    // Method to get the prices of all items
     public Dictionary<string, int> GetItemPrices()
     {
         return itemPrices;
+    }
+
+    public void CreateGroupForItem(string itemName, int itemPrice)
+    {
+        GameObject group = Instantiate(itemGroupPrefab, itemListParent);
+        group.name = itemName;
+        TMP_Text[] texts = group.GetComponentsInChildren<TMP_Text>();
+        foreach (TMP_Text text in texts)
+        {
+            if (text.name == "ItemName")
+            {
+                text.text = itemName;
+            }
+            else if (text.name == "ItemPrice")
+            {
+                text.text = itemPrice.ToString();
+            }
+        }
+    }
+
+    public void UpdateGroupPrice(string itemName, int newPrice)
+    {
+        GameObject group = itemListParent.Find(itemName).gameObject;
+        TMP_Text priceText = group.transform.Find("ItemPrice").GetComponent<TMP_Text>();
+        priceText.text = newPrice.ToString();
     }
 }
