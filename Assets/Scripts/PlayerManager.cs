@@ -4,62 +4,42 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    public float coins = 1000;
-    private Dictionary<string, float> inventory = new Dictionary<string, float>();
-    private ShopManager shopManager;
-
-    private void Start()
-    {
-
-        shopManager = FindObjectOfType<ShopManager>();
-
-
-        if (shopManager == null)
-        {
-            Debug.LogError("ShopManager component not found in the scene.");
-        }
-    }
+    public int money = 100;
+    public ShopManager shopManager;
 
     public void BuyItem(string itemName)
     {
+        Debug.Log("Attempting to buy item: " + itemName); 
 
-        if (shopManager == null)
+        int itemPrice = shopManager.GetItemPrice(itemName); 
+        if (itemPrice == -1)
         {
-            Debug.LogError("ShopManager reference not set in PlayerManager!");
+            Debug.LogError("Item not found in the shop!");
             return;
         }
+    
 
- 
-        if (!shopManager.GetItemPrices().ContainsKey(itemName))
+        if (money >= itemPrice)
         {
-            Debug.LogError("Item " + itemName + " does not exist in the shop!");
-            return;
-        }
-
-        float itemPrice = shopManager.GetItemPrices()[itemName];
-
-        if (coins >= itemPrice)
-        {
-            if (inventory.ContainsKey(itemName))
-            {
-                inventory[itemName]++;
-            }
-            else
-            {
-                inventory[itemName] = 1;
-            }
-
-            coins -= itemPrice;
-            Debug.Log(itemName + " purchased. You have " + GetNumberOfItems(itemName) + " " + itemName + "(s) and " + coins.ToString() + " coins remaining.");
+            money -= itemPrice; 
+            Debug.Log("You bought " + itemName + " for " + itemPrice + " money.");
+      
         }
         else
         {
-            Debug.Log("Not enough coins to purchase " + itemName);
+            Debug.LogWarning("Not enough money to buy " + itemName + ".");
         }
     }
 
-    private float GetNumberOfItems(string itemName)
+
+    public void AddMoney(int amount)
     {
-        return inventory.ContainsKey(itemName) ? inventory[itemName] : 0;
+        money += amount;
+    }
+
+
+    public void RemoveMoney(int amount)
+    {
+        money -= amount;
     }
 }

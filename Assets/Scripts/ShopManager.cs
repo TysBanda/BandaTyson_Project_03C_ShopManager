@@ -5,12 +5,29 @@ using TMPro;
 
 public class ShopManager : MonoBehaviour
 {
+    [System.Serializable]
+    public class ItemData
+    {
+        public string itemName;
+        public int itemPrice;
+    }
+
     public Transform itemListParent;
     public GameObject itemGroupPrefab;
     public TMP_Text itemNameText;
     public TMP_Text itemPriceText;
 
     private Dictionary<string, int> itemPrices = new Dictionary<string, int>();
+
+    public List<ItemData> shopItems; 
+
+    private void Start()
+    {
+        foreach (ItemData item in shopItems)
+        {
+            itemPrices.Add(item.itemName, item.itemPrice);
+        }
+    }
 
     public void AddItem(string itemName, int itemPrice)
     {
@@ -39,9 +56,17 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    public Dictionary<string, int> GetItemPrices()
+    public int GetItemPrice(string itemName)
     {
-        return itemPrices;
+        if (itemPrices.ContainsKey(itemName))
+        {
+            return itemPrices[itemName];
+        }
+        else
+        {
+            Debug.LogError("Item " + itemName + " not found in shop!");
+            return -1; 
+        }
     }
 
     public void CreateGroupForItem(string itemName, int itemPrice)
@@ -69,3 +94,4 @@ public class ShopManager : MonoBehaviour
         priceText.text = newPrice.ToString();
     }
 }
+
